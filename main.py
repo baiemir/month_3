@@ -13,10 +13,10 @@ def main_page(page: ft.Page):
 
     greeting_history = []
     history_text = ft.Text('История приветствий:')
-    # 2. Добавляем кнопку избранного и список избранных имен
+    
     favorite_list = []
     history_favorites_text = ft.Text('Избранные имена:')
-    # 1. Добавить сохранении истории
+    
     try:
         with open('greeting_history.txt', 'r') as file:
             greeting_history = file.read().splitlines()
@@ -44,14 +44,14 @@ def main_page(page: ft.Page):
             hello_text.value = f'{datetime} Привет, {name}!'
             name_input.value = ''
 
-            # Задание 4: сохраняем историю приветствий, оставляем только последние 5
+            
             greeting_history[:] = greeting_history[-5:]
 
             greeting_history.append(name)
             print(greeting_history)
             history_text.value = 'История приветствий: \n-' + '\n-'.join(greeting_history)
             
-            # Задание 1: сохраняем историю приветствий в файл
+            
             with open('greeting_history.txt', 'w') as file:
                 file.write('\n'.join(greeting_history))
 
@@ -67,7 +67,7 @@ def main_page(page: ft.Page):
         history_text.value = 'История приветствий:'
         history_favorites_text.value = 'Избранные имена:'
         page.update()
-        # Задание 1: очищаем файл с историей приветствий
+    
         with open('greeting_history.txt', 'w') as file:
             file.write('')
     
@@ -82,19 +82,36 @@ def main_page(page: ft.Page):
                 name_input.value = ''
                 hello_text.value = f'{name} добавлено в избранные.'
                 page.update()
+
+    def on_button_click_random_name(_):
+        if greeting_history:
+            import random
+            random_name = random.choice(greeting_history)
+            hello_text.color = ft.Colors.GREEN if random_name in greeting_history else None
+            hello_text.value = f'Рандомное имя из истории: {random_name}'
+            page.update()
             
+    def on_button_click_hide_show_history(_):
+        if history_text.visible:
+            history_text.visible = False
+            history_favorites_text.visible = False
+        else:
+            history_text.visible = True
+            history_favorites_text.visible = True
+        page.update()
 
 
+    hide_show_history_button = ft.ElevatedButton('Показать/скрыть историю', on_click=on_button_click_hide_show_history)
+    random_name_button = ft.ElevatedButton('Рандомное имя', on_click=on_button_click_random_name)
     favorite_button = ft.IconButton(icon=ft.Icons.STAR, on_click=add_to_favorites)
-
     theme_button = ft.ElevatedButton('Change theme color', ft.Icons.BRIGHTNESS_6, on_click=on_button_click_change_theme_color)
     name_input = ft.TextField(label="Введите ваше имя", on_submit=on_button_click)
     elevated_button = ft.ElevatedButton('SEND', icon=ft.Icons.SEND, on_click=on_button_click)
     #text_button = ft.TextButton(text='SEND', icon=ft.Icons.SEND)
     #icon_button = ft.IconButton(icon=ft.Icons.SEND)
 
-    page.add(hello_text, name_input, elevated_button, theme_button, clear_button, favorite_button, history_text, 
-             history_favorites_text)
+    page.add(hello_text, name_input, elevated_button, theme_button, random_name_button, hide_show_history_button 
+             , clear_button, favorite_button, history_text, history_favorites_text)
 
 
 
